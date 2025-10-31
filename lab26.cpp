@@ -22,14 +22,14 @@ const int W1 = 12;// width for printing
 
 int main() {
 
-    long long accum[ROWS][COLS];// accumulation array for times
+    long long results[NUM_RUNS][ROWS][COLS];// to store timing results
 
-    long long results[ROWS][COLS];// accumulation array for times
-    for (int r = 0; r < ROWS; ++r)// initialize accumulation array
+    long long accum[ROWS][COLS];// to accumulate totals for averaging
+    for (int run = 0; run < ROWS; ++run)// for each run set up data structures
         for (int c = 0; c < COLS; ++c)
-            accum[r][c] = 0;
+            accum[run][c] = 0;
 
-    for (int run = 0; run < NUM_RUNS; ++run) {// for each run set up data structures
+    for (int run = 0; run < NUM_RUNS; ++run) {
         vector<string> data_vector;
         list<string> data_list;
         set<string> data_set;
@@ -48,10 +48,30 @@ int main() {
             auto end = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
             results[run][0][0] = duration.count();
-            fin.clear();
-            fin.seekg(0, ios::beg);
+            fin.close();
         }
+
+        {//read into the list structure
+            ifstream fin("codes.txt");
+            if (!fin) {
+                cerr << "Error opening file." << endl;
+                return 1;
+            }
+            string cd;
+            auto start = chrono::high_resolution_clock::now();     
+            while (fin >> cd) {
+                data_list.push_back(cd);
+            }
+            auto end = chrono::high_resolution_clock::now();// end timing
+            auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+            results[run][0][1] = duration.count();
+            fin.close();
+        }
+
 
     }
 
+    
+    // Print averaged results
+    
 }
