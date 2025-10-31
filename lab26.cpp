@@ -21,10 +21,28 @@ const int COLS = STRUCTURES;// for vector, list, set
 
 int main() {
 
+    long long accum[ROWS][COLS];
+    
+    for (int r = 0; r < ROWS; ++r)
+        for (int c = 0; c < COLS; ++c)
+            accum[r][c] = 0;
+
     for (int run = 0; run < NUM_RUNS; ++run) {// for each run set up data structures
         vector<string> data_vector;
         list<string> data_list;
         set<string> data_set;
+
+        {
+            ifstream fin("codes.txt");
+            if (!fin) {
+                cerr << "Error opening file." << endl;
+                return 1;
+            }
+            string cd;
+            auto start = chrono::high_resolution_clock::now();
+            
+        }
+
     }
 
 }
