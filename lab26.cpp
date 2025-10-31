@@ -16,6 +16,7 @@ const int NUM_RUNS = 15;// number of runs for averaging
 const int STRUCTURES = 3;// vector, list, set
 const int ROWS = 4;// for data sizes
 const int COLS = STRUCTURES;// for vector, list, set
+const int W1 = 12;// width for printing
 
 
 
@@ -23,6 +24,7 @@ int main() {
 
     long long accum[ROWS][COLS];// accumulation array for times
 
+    long long results[ROWS][COLS];// accumulation array for times
     for (int r = 0; r < ROWS; ++r)// initialize accumulation array
         for (int c = 0; c < COLS; ++c)
             accum[r][c] = 0;
@@ -39,7 +41,15 @@ int main() {
                 return 1;
             }
             string cd;
-            auto start = chrono::high_resolution_clock::now();            
+            auto start = chrono::high_resolution_clock::now();     
+            while (fin >> cd) {
+                data_vector.push_back(cd);
+            }
+            auto end = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+            results[run][0][0] = duration.count();
+            fin.clear();
+            fin.seekg(0, ios::beg);
         }
 
     }
