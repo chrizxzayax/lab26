@@ -21,9 +21,9 @@ const int COLS = STRUCTURES;// for vector, list, set
 
 int main() {
 
-    long long accum[ROWS][COLS];
-    
-    for (int r = 0; r < ROWS; ++r)
+    long long accum[ROWS][COLS];// accumulation array for times
+
+    for (int r = 0; r < ROWS; ++r)// initialize accumulation array
         for (int c = 0; c < COLS; ++c)
             accum[r][c] = 0;
 
@@ -39,8 +39,7 @@ int main() {
                 return 1;
             }
             string cd;
-            auto start = chrono::high_resolution_clock::now();
-            
+            auto start = chrono::high_resolution_clock::now();            
         }
 
     }
