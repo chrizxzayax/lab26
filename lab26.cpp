@@ -141,39 +141,77 @@ int main() {
         if( nvec == 0 || nlist == 0 || nset == 0 ){
             results[run][3][0] = results[run][3][1] = results[run][3][2] = -1;
         }else {
+
+            size_t ind = nvec / 2;
             {
-                size_t ind_v = nvec / 2;
+                string target_v = data_vector[ind];
                 auto start = chrono::high_resolution_clock::now();
-                data_vector.erase(data_vector.begin() + ind_v);
-                auto end = chrono::high_resolution_clock::now();// end timing
+                // remove shifts elements and returns new end; erase actually removes them
+                data_vector.erase(remove(data_vector.begin(), data_vector.end(), target_v), data_vector.end());
+                auto end = chrono::high_resolution_clock::now();
                 auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
                 results[run][3][0] = duration.count();
             }
+            
             {
-                size_t ind_l = nlist / 2;
                 auto it = data_list.begin();
-                advance(it, ind_l);
+                advance(it, ind);
+                string target_l = *it;
                 auto start = chrono::high_resolution_clock::now();
-                data_list.erase(it);
-                auto end = chrono::high_resolution_clock::now();// end timing
+                data_list.remove(target_l);// removes all occurrences
+                auto end = chrono::high_resolution_clock::now();
                 auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
                 results[run][3][1] = duration.count();
             }
             {
-                string mid_elem;
                 auto it = data_set.begin();
-                advance(it, nset / 2);
-                mid_elem = *it;
+                advance(it, ind < nset ? ind : (nset - 1)); // safe-guard if sizes differ
+                string target_s = *it;
                 auto start = chrono::high_resolution_clock::now();
-                data_set.erase(mid_elem);
-                auto end = chrono::high_resolution_clock::now();// end timing
+                data_set.erase(target_s);
+                auto end = chrono::high_resolution_clock::now();
                 auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
                 results[run][3][2] = duration.count();
             }
         }
-        
+        for (int op = 0; op < ROWS; ++op)
+            for (int st = 0; st < COLS; ++st)
+                if (results[run][op][st] >= 0) //If this operation is inapplicable (e.g., sort on set stored as -1),
+                // skip adding that to the accumulator and i won't include it when averaging.
+                    accum[op][st] += results[run][op][st];
+
     }
 
+    double averages[ROWS][COLS];
+    for (int op = 0; op < ROWS; ++op) {
+        for (int st = 0; st < COLS; ++st) {
+            if (op == 1 && st == 2) { // sort on set marked as -1
+                averages[op][st] = -1.0;
+            } else {
+                // For simplicity we divide by NUM_RUNS even if some runs had -1 (not timed)
+                averages[op][st] = static_cast<double>(accum[op][st]) / static_cast<double>(NUM_RUNS);
+            }
+        }
+    }
+
+    // Nicely print results
+    string labels[] = {"Read", "Sort", "Insert", "Delete"};
+    cout << endl;
+    cout << "Number of simulations: " << NUM_RUNS << endl << endl;
+    cout << setw(W1) << "Operation" << setw(W1) << "Vector" << setw(W1) << "List" << setw(W1) << "Set" << endl;
+    for (int i = 0; i < ROWS; i++) {
+        cout << setw(W1) << labels[i];
+        for (int j = 0; j < COLS; j++) {// print each average
+            if (averages[i][j] < 0)
+                cout << setw(W1) << -1;
+            else
+                cout << setw(W1) << static_cast<long long>(averages[i][j] + 0.5); // rounded microseconds 
+        }
+        cout << endl;
+    }
+
+    cout << endl << "Done. Averages above are in microseconds." << endl;
+    return 0;
     
     // Print averaged results
     
